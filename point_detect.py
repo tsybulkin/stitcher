@@ -2,20 +2,9 @@
 # finds key points in two images
 #
 
-
 import numpy as np
 import cv2
-import os
 #from matplotlib import pyplot as plt
-
-
-def run():
-	my_path = 'field_photos/'
-	photos = [ f for f in os.listdir(my_path) if f[-3:]=='JPG' or f[-3:]=='jpg' ]
-	print photos
-
-	[ get_matched_points(my_path+photos[i],my_path+photos[i+1]) for i in range(len(photos)-1) ]
-	
 	
 
 
@@ -29,8 +18,8 @@ def get_matched_points(photo1,photo2):
 	img1 = cv2.imread(photo1,0)
 	img2 = cv2.imread(photo2,0)
 
-	img1 = pyrDown(img1,3)
-	img2 = pyrDown(img2,3)
+	img1 = pyrDown(img1,2)
+	img2 = pyrDown(img2,2)
 
 	orb = cv2.ORB_create()
 
@@ -42,25 +31,31 @@ def get_matched_points(photo1,photo2):
 	# create BFMatcher object
 	bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-	# Match descriptors.
+	# Match descriptors
 	matches = bf.match(des1,des2)
 
 	# Sort them in the order of their distance.
 	matches = sorted(matches, key = lambda x:x.distance)
+	if len(matches) > 15: matches = matches[:15]
+	
+	# Select (uv1,uv2) from matched points
+	points = []
 	print "\n", photo1,photo2
-	print [ m.distance for m in matches]
-	# imgIdx', 'queryIdx'
+	for m in matches:
+		j,i = m.imgIdx,m.queryIdx
+		p1 = np.array(kp1[i].pt)
+		p2 = np.array(kp2[j].pt)
+		points.append((p1,p2))
+	return points
+	
 	"""
-	# Draw first 10 matches.
+	# Draw first matches.
 	img3 = img1.copy()
-	img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:10], img3,flags=2)
+	img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches, img3,flags=2)
 
 	cv2.imshow('matches',img3)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 	"""
 
-
-if __name__ == "__main__":
-	run()
 
