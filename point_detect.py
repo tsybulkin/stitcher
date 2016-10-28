@@ -2,7 +2,7 @@
 # finds key points in two images
 #
 
-import numpy as np
+#import numpy as np
 import cv2
 #from matplotlib import pyplot as plt
 	
@@ -43,9 +43,9 @@ def get_matched_points(photo1,photo2):
 	print "\n", photo1,photo2
 	for m in matches:
 		j,i = m.imgIdx,m.queryIdx
-		p1 = np.array(kp1[i].pt)
-		p2 = np.array(kp2[j].pt)
-		points.append((p1,p2))
+		#p1 = np.array(kp1[i].pt)
+		#p2 = np.array(kp2[j].pt)
+		points.append((kp1[i].pt,kp2[j].pt))
 	return points
 	
 	"""
